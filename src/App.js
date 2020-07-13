@@ -4,7 +4,8 @@ import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
 import NumberMask from 'components/NumberMask'
 import React, {useEffect, useState} from 'react'
-import {useForm} from 'react-hook-form'
+import {useForm, Controller} from 'react-hook-form'
+import NumberFormat from 'react-number-format'
 
 const moneyProps = {
   thousandSeparator: ',',
@@ -14,12 +15,13 @@ const moneyProps = {
   fixedDecimalScale: true,
 }
 
-const CadastroDoImovel = ({history, match, setActiveStep, activeStep}) => {
-  const {register, handleSubmit, setError, clearErrors, errors, reset} = useForm()
+const App = ({history, match, setActiveStep, activeStep}) => {
+  const {register, handleSubmit, control, errors, reset} = useForm()
   const [currentProperty] = useState({
     name: 'John Doe',
     amount1: 100,
     amount2: undefined,
+    amount3: undefined,
   })
 
   /* useEffect(() => {
@@ -41,6 +43,7 @@ const CadastroDoImovel = ({history, match, setActiveStep, activeStep}) => {
     console.log('form validated', formData)
   }
 
+  console.log('ERRORS: ', errors)
   return (
     <div>
       <form onSubmit={handleFormSubmit}>
@@ -70,15 +73,44 @@ const CadastroDoImovel = ({history, match, setActiveStep, activeStep}) => {
               }}
             />
 
-            <TextField
+            <Controller
+              as={TextField}
+              control={control}
               label="Amount 2"
               name="amount2"
               defaultValue={currentProperty.amount2}
               error={errors.amount2}
               helperText={errors.amount2?.message}
-              inputRef={register({required: 'required fied'})}
-              onChange={(e) => console.log('TextField onChange', e.target.value)}
-              onFocus={(e) => console.log('TextField onFocus', e.target.value)}
+              rules={{
+                validate: (value) => {
+                  const intVal = parseInt(value?.replace(/\D/g, '')) / 100
+                  console.log(value, intVal)
+                  return intVal > 0 || ''
+                },
+              }}
+              InputProps={{
+                inputComponent: NumberFormat,
+                inputProps: {
+                  ...moneyProps,
+                },
+              }}
+            />
+
+            <Controller
+              as={TextField}
+              control={control}
+              label="Amount 3"
+              name="amount3"
+              defaultValue={currentProperty.amount3}
+              error={errors.amount3}
+              helperText={errors.amount3?.message}
+              rules={{
+                validate: (value) => {
+                  const intVal = parseInt(value?.replace(/\D/g, '')) / 100
+                  console.log(value, intVal)
+                  return intVal > 0 || ''
+                },
+              }}
               InputProps={{
                 inputComponent: NumberMask,
                 inputProps: {
@@ -97,4 +129,4 @@ const CadastroDoImovel = ({history, match, setActiveStep, activeStep}) => {
     </div>
   )
 }
-export default CadastroDoImovel
+export default App
