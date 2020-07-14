@@ -16,12 +16,11 @@ const moneyProps = {
 }
 
 const App = ({history, match, setActiveStep, activeStep}) => {
-  const {register, handleSubmit, control, errors, reset} = useForm()
-  const [currentProperty] = useState({
-    name: 'John Doe',
-    amount1: 100,
+  const {register, handleSubmit, control, errors, setValue, getValues, reset} = useForm()
+  const [currentProperty, setProperty] = useState({
+    name: '',
+    amount1: undefined,
     amount2: undefined,
-    amount3: undefined,
   })
 
   /* useEffect(() => {
@@ -39,6 +38,17 @@ const App = ({history, match, setActiveStep, activeStep}) => {
     handleSubmit(processForm)()
   }
 
+  const fill = () => {
+    const newName = 'Doe John'
+    setValue('name', newName, {shouldValidate: true})
+    // reset({name: newName})
+    /* setProperty({
+      name: newName,
+      amount1: undefined,
+      amount2: undefined,
+    }) */
+  }
+
   const processForm = async (formData) => {
     console.log('form validated', formData)
   }
@@ -52,11 +62,13 @@ const App = ({history, match, setActiveStep, activeStep}) => {
             <TextField
               label="Name"
               name="name"
+              InputLabelProps={{shrink: getValues('name')}} //comment this to see float label overlaping on FILL
               defaultValue={currentProperty.name}
               inputRef={register({required: 'required fied'})}
               error={errors.name}
               helperText={errors.name?.message}
             />
+
             <TextField
               label="Amount 1"
               name="amount1"
@@ -72,7 +84,6 @@ const App = ({history, match, setActiveStep, activeStep}) => {
                 },
               }}
             />
-
             <Controller
               as={TextField}
               control={control}
@@ -89,29 +100,6 @@ const App = ({history, match, setActiveStep, activeStep}) => {
                 },
               }}
               InputProps={{
-                inputComponent: NumberFormat,
-                inputProps: {
-                  ...moneyProps,
-                },
-              }}
-            />
-
-            <Controller
-              as={TextField}
-              control={control}
-              label="Amount 3"
-              name="amount3"
-              defaultValue={currentProperty.amount3}
-              error={errors.amount3}
-              helperText={errors.amount3?.message}
-              rules={{
-                validate: (value) => {
-                  const intVal = parseInt(value?.replace(/\D/g, '')) / 100
-                  console.log(value, intVal)
-                  return intVal > 0 || ''
-                },
-              }}
-              InputProps={{
                 inputComponent: NumberMask,
                 inputProps: {
                   ...moneyProps,
@@ -120,6 +108,9 @@ const App = ({history, match, setActiveStep, activeStep}) => {
             />
           </Grid>
           <Grid item style={{marginTop: '20px'}}>
+            <Button variant="outlined" color="secondary" onClick={fill}>
+              Fill
+            </Button>
             <Button variant="contained" color="primary" onClick={handleFormSubmit}>
               Continue
             </Button>
